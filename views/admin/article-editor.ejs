@@ -1,0 +1,553 @@
+<%- include('../partials/header', { title: title, extraCSS: '<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">' }) %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3><i class="bi bi-pencil-square"></i> <%= isEdit ? 'Edit Article' : 'New Article' %></h3>
+  <div>
+    <button class="btn btn-outline-secondary me-2" id="previewBtn"><i class="bi bi-eye me-1"></i> Preview</button>
+    <% if (isEdit) { %>
+      <button class="btn btn-success me-2" id="publishBtn" <%= article.status === 'published' ? 'disabled' : '' %>>
+        <i class="bi bi-check-circle me-1"></i> Publish
+      </button>
+    <% } %>
+    <button class="btn btn-primary" id="saveBtn"><i class="bi bi-floppy me-1"></i> Save</button>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Main Content Column -->
+  <div class="col-lg-8">
+    <!-- Title -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <label class="form-label fw-semibold">Title</label>
+        <input type="text" class="form-control" id="articleTitle" value="<%= isEdit ? article.title : '' %>" placeholder="Article title" maxlength="150">
+        <div class="d-flex justify-content-between mt-1">
+          <small class="text-muted">Slug: <span id="slugPreview"><%= isEdit ? article.slug : '' %></span></small>
+          <small class="char-count" id="titleCharCount">0/150</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Generation -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+        <span><i class="bi bi-robot"></i> AI Content Generation</span>
+        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#aiPanel">Toggle</button>
+      </div>
+      <div class="collapse <%= isEdit ? '' : 'show' %>" id="aiPanel">
+        <div class="card-body">
+          <div class="row g-2 mb-2">
+            <div class="col-md-4">
+              <label class="form-label small">Location</label>
+              <input type="text" class="form-control form-control-sm" id="aiLocation" value="<%= isEdit ? (article.location || '') : (config.defaultLocation || '') %>" placeholder="e.g., Nairobi">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">Category</label>
+              <select class="form-select form-select-sm" id="aiCategory">
+                <option value="">Select...</option>
+                <% (categories || []).forEach(cat => { %>
+                  <option value="<%= cat %>" <%= isEdit && article.category === cat ? 'selected' : '' %>><%= cat %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label small">Article Type</label>
+              <select class="form-select form-select-sm" id="aiArticleType">
+                <% (articleTypes || []).forEach(type => { %>
+                  <option value="<%= type %>" <%= isEdit && article.articleType === type ? 'selected' : '' %>><%= type %></option>
+                <% }) %>
+              </select>
+            </div>
+          </div>
+          <div class="form-check form-switch mb-2">
+            <input class="form-check-input" type="checkbox" id="aiIsPillar" <%= isEdit && article.isPillarContent ? 'checked' : '' %>>
+            <label class="form-check-label" for="aiIsPillar">Pillar Content (comprehensive guide)</label>
+          </div>
+
+          <!-- User Entity List -->
+          <div class="mb-2">
+            <label class="form-label small"><%= config.entityPlural || 'Entities' %> List (optional)</label>
+            <textarea class="form-control form-control-sm" id="aiEntityList" rows="4" placeholder="Paste entity names with details, one per line. E.g.:&#10;## Entity Name&#10;Located in City. Features include X, Y, Z."></textarea>
+            <div class="form-text">Add specific <%= (config.entityPlural || 'entities').toLowerCase() %> you want included. AI will also pull from the database.</div>
+          </div>
+
+          <button class="btn btn-primary" id="generateBtn">
+            <i class="bi bi-magic me-1"></i> Generate with AI
+          </button>
+          <div id="aiStatus" class="mt-2 small d-none"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content Editor -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white fw-bold">Content</div>
+      <div class="card-body p-0">
+        <div id="editor"><%= isEdit ? article.content : '' %></div>
+      </div>
+    </div>
+
+    <!-- Excerpt -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <label class="form-label fw-semibold">Excerpt</label>
+        <textarea class="form-control" id="articleExcerpt" rows="3" maxlength="300" placeholder="Brief article summary"><%= isEdit ? (article.excerpt || '') : '' %></textarea>
+        <small class="char-count" id="excerptCharCount">0/300</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sidebar Column -->
+  <div class="col-lg-4">
+    <!-- Status -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white fw-bold">Status</div>
+      <div class="card-body">
+        <select class="form-select" id="articleStatus">
+          <option value="draft" <%= isEdit && article.status === 'draft' ? 'selected' : '' %>>Draft</option>
+          <option value="published" <%= isEdit && article.status === 'published' ? 'selected' : '' %>>Published</option>
+          <option value="archived" <%= isEdit && article.status === 'archived' ? 'selected' : '' %>>Archived</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Featured Image -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white fw-bold">Featured Image</div>
+      <div class="card-body">
+        <div id="imagePreview" class="mb-2">
+          <% if (isEdit && article.featuredImage) { %>
+            <img src="<%= article.featuredImage %>" class="img-fluid rounded" style="max-height:200px;">
+          <% } %>
+        </div>
+        <input type="file" class="form-control form-control-sm mb-2" id="imageFile" accept="image/*">
+        <button class="btn btn-sm btn-outline-primary w-100" id="uploadImageBtn" disabled><i class="bi bi-upload me-1"></i> Upload</button>
+        <input type="hidden" id="featuredImageUrl" value="<%= isEdit ? (article.featuredImage || '') : '' %>">
+        <div class="mt-1"><small class="text-muted">Or paste URL:</small>
+          <input type="text" class="form-control form-control-sm mt-1" id="imageUrlInput" value="<%= isEdit ? (article.featuredImage || '') : '' %>" placeholder="https://...">
+        </div>
+      </div>
+    </div>
+
+    <!-- Classification -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white fw-bold">Classification</div>
+      <div class="card-body">
+        <div class="mb-2">
+          <label class="form-label small">Category</label>
+          <select class="form-select form-select-sm" id="articleCategory">
+            <option value="">None</option>
+            <% (categories || []).forEach(cat => { %>
+              <option value="<%= cat %>" <%= isEdit && article.category === cat ? 'selected' : '' %>><%= cat %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Article Type</label>
+          <select class="form-select form-select-sm" id="articleType">
+            <% (articleTypes || []).forEach(type => { %>
+              <option value="<%= type %>" <%= isEdit && article.articleType === type ? 'selected' : '' %>><%= type %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Location</label>
+          <input type="text" class="form-control form-control-sm" id="articleLocation" value="<%= isEdit ? (article.location || '') : (config.defaultLocation || '') %>">
+        </div>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="isPillarContent" <%= isEdit && article.isPillarContent ? 'checked' : '' %>>
+          <label class="form-check-label small" for="isPillarContent">Pillar Content</label>
+        </div>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="isFeatured" <%= isEdit && article.isFeatured ? 'checked' : '' %>>
+          <label class="form-check-label small" for="isFeatured">Featured</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pillar Linking -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white fw-bold">Pillar/Cluster</div>
+      <div class="card-body">
+        <div class="mb-2">
+          <label class="form-label small">Parent Pillar</label>
+          <select class="form-select form-select-sm" id="pillarContentId">
+            <option value="">None</option>
+            <% (pillarArticles || []).forEach(p => { %>
+              <option value="<%= p._id %>" <%= isEdit && article.pillarContentId && article.pillarContentId.toString() === p._id.toString() ? 'selected' : '' %>><%= p.title %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="mb-0">
+          <label class="form-label small">Topic Cluster</label>
+          <input type="text" class="form-control form-control-sm" id="topicCluster" value="<%= isEdit ? (article.topicCluster || '') : '' %>" placeholder="e.g., coffee-nairobi">
+        </div>
+      </div>
+    </div>
+
+    <!-- SEO -->
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-header bg-white fw-bold">SEO</div>
+      <div class="card-body">
+        <div class="mb-2">
+          <label class="form-label small">Slug</label>
+          <input type="text" class="form-control form-control-sm" id="articleSlug" value="<%= isEdit ? article.slug : '' %>" placeholder="auto-generated-from-title">
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Meta Description</label>
+          <textarea class="form-control form-control-sm" id="seoMetaDescription" rows="2" maxlength="160"><%= isEdit ? (article.seoMetaDescription || '') : '' %></textarea>
+          <small class="char-count" id="metaCharCount">0/160</small>
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Primary Keyword</label>
+          <input type="text" class="form-control form-control-sm" id="primaryKeyword" value="<%= isEdit ? (article.primaryKeyword || '') : '' %>">
+        </div>
+        <div class="mb-2">
+          <label class="form-label small">Tags</label>
+          <div id="tagContainer" class="d-flex flex-wrap gap-1 mb-1">
+            <% if (isEdit && article.tags) { article.tags.forEach(tag => { %>
+              <span class="tag-badge"><%= tag %> <span class="remove" onclick="this.parentElement.remove()">×</span></span>
+            <% }) } %>
+          </div>
+          <input type="text" class="form-control form-control-sm" id="tagInput" placeholder="Type tag + Enter">
+        </div>
+        <div class="mb-0">
+          <label class="form-label small">Keywords</label>
+          <div id="keywordContainer" class="d-flex flex-wrap gap-1 mb-1">
+            <% if (isEdit && article.seoKeywords) { article.seoKeywords.forEach(kw => { %>
+              <span class="tag-badge"><%= kw %> <span class="remove" onclick="this.parentElement.remove()">×</span></span>
+            <% }) } %>
+          </div>
+          <input type="text" class="form-control form-control-sm" id="keywordInput" placeholder="Type keyword + Enter">
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden fields -->
+<input type="hidden" id="articleId" value="<%= isEdit ? article._id : '' %>">
+<input type="hidden" id="isEditMode" value="<%= isEdit %>">
+
+<!-- Quill Editor -->
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
+<%- include('../partials/footer', { extraJS: `
+<script>
+  // ==========================================
+  // Quill Editor Setup
+  // ==========================================
+  const quill = new Quill('#editor', {
+    theme: 'snow',
+    modules: {
+      toolbar: [
+        [{ header: [2, 3, 4, false] }],
+        ['bold', 'italic', 'underline', 'strike'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['blockquote', 'link', 'image'],
+        ['clean']
+      ]
+    },
+    placeholder: 'Write your article content here or use AI generation above...'
+  });
+
+  // ==========================================
+  // Character Counters
+  // ==========================================
+  function updateCounter(inputId, counterId, max) {
+    const el = document.getElementById(inputId);
+    const counter = document.getElementById(counterId);
+    if (!el || !counter) return;
+    const update = () => {
+      const len = el.value.length;
+      counter.textContent = len + '/' + max;
+      counter.className = 'char-count' + (len > max ? ' over' : '');
+    };
+    el.addEventListener('input', update);
+    update();
+  }
+  updateCounter('articleTitle', 'titleCharCount', 150);
+  updateCounter('articleExcerpt', 'excerptCharCount', 300);
+  updateCounter('seoMetaDescription', 'metaCharCount', 160);
+
+  // ==========================================
+  // Auto Slug Generation
+  // ==========================================
+  const titleInput = document.getElementById('articleTitle');
+  const slugInput = document.getElementById('articleSlug');
+  const slugPreview = document.getElementById('slugPreview');
+  let slugManuallyEdited = ${isEdit ? 'true' : 'false'};
+
+  function slugify(input) {
+    if (!input) return '';
+    return String(input)
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '') // strip diacritics
+      .toLowerCase()
+      .trim()
+      .replace(/['’]/g, '') // drop apostrophes
+      .replace(/[^a-z0-9\s-]/g, '') // keep letters, numbers, spaces, hyphens
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+  }
+
+  titleInput.addEventListener('input', () => {
+    if (!slugManuallyEdited) {
+      const slug = slugify(titleInput.value);
+      slugInput.value = slug;
+      slugPreview.textContent = slug;
+    }
+  });
+  slugInput.addEventListener('input', () => {
+    slugManuallyEdited = true;
+    slugPreview.textContent = slugInput.value;
+  });
+  slugInput.addEventListener('blur', () => {
+    // Keep manually-entered slugs clean/consistent.
+    const cleaned = slugify(slugInput.value);
+    slugInput.value = cleaned;
+    slugPreview.textContent = cleaned;
+  });
+
+  // ==========================================
+  // Tag / Keyword Management
+  // ==========================================
+  function setupTagInput(inputId, containerId) {
+    const input = document.getElementById(inputId);
+    const container = document.getElementById(containerId);
+    if (!input || !container) return;
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const val = input.value.trim();
+        if (!val) return;
+        const badge = document.createElement('span');
+        badge.className = 'tag-badge';
+        badge.innerHTML = val + ' <span class="remove" onclick="this.parentElement.remove()">×</span>';
+        container.appendChild(badge);
+        input.value = '';
+      }
+    });
+  }
+  setupTagInput('tagInput', 'tagContainer');
+  setupTagInput('keywordInput', 'keywordContainer');
+
+  // ==========================================
+  // Image Upload
+  // ==========================================
+  const imageFile = document.getElementById('imageFile');
+  const uploadBtn = document.getElementById('uploadImageBtn');
+  const imagePreview = document.getElementById('imagePreview');
+  const featuredImageUrl = document.getElementById('featuredImageUrl');
+  const imageUrlInput = document.getElementById('imageUrlInput');
+
+  imageFile.addEventListener('change', () => { uploadBtn.disabled = !imageFile.files.length; });
+  imageUrlInput.addEventListener('change', () => {
+    featuredImageUrl.value = imageUrlInput.value;
+    if (imageUrlInput.value) {
+      imagePreview.innerHTML = '<img src="' + imageUrlInput.value + '" class="img-fluid rounded" style="max-height:200px;">';
+    }
+  });
+
+  uploadBtn.addEventListener('click', async () => {
+    if (!imageFile.files.length) return;
+    const formData = new FormData();
+    formData.append('image', imageFile.files[0]);
+    uploadBtn.disabled = true;
+    uploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Uploading...';
+    try {
+      const res = await fetch('/api/articles/upload-image', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        featuredImageUrl.value = data.imageUrl;
+        imageUrlInput.value = data.imageUrl;
+        imagePreview.innerHTML = '<img src="' + data.imageUrl + '" class="img-fluid rounded" style="max-height:200px;">';
+      } else { alert('Upload failed: ' + data.message); }
+    } catch (err) { alert('Upload error: ' + err.message); }
+    uploadBtn.disabled = false;
+    uploadBtn.innerHTML = '<i class="bi bi-upload me-1"></i> Upload';
+  });
+
+  // ==========================================
+  // AI Generation
+  // ==========================================
+  document.getElementById('generateBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('generateBtn');
+    const status = document.getElementById('aiStatus');
+    const title = document.getElementById('articleTitle').value || '';
+    const location = document.getElementById('aiLocation').value;
+    const category = document.getElementById('aiCategory').value;
+    const articleType = document.getElementById('aiArticleType').value;
+    const isPillar = document.getElementById('aiIsPillar').checked;
+    const entityList = document.getElementById('aiEntityList').value;
+
+    if (!location || !category) { alert('Location and Category are required for AI generation'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Generating...';
+    status.classList.remove('d-none');
+    status.className = 'mt-2 small text-info';
+    status.textContent = 'Calling AI... this may take 30-60 seconds.';
+
+    try {
+      const res = await fetch('/api/articles/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: title || null,
+          location, category, articleType,
+          isPillarContent: isPillar,
+          entityList: entityList || null,
+          saveToDatabase: false
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.article) {
+        // Fill in the editor
+        quill.root.innerHTML = data.article.content || '';
+        if (data.article.title && !title) document.getElementById('articleTitle').value = data.article.title;
+        if (data.article.excerpt) document.getElementById('articleExcerpt').value = data.article.excerpt;
+        if (data.article.seoMetaDescription) document.getElementById('seoMetaDescription').value = data.article.seoMetaDescription;
+
+        // Fill tags and keywords
+        if (data.article.tags) {
+          const tc = document.getElementById('tagContainer');
+          data.article.tags.forEach(tag => {
+            const badge = document.createElement('span');
+            badge.className = 'tag-badge';
+            badge.innerHTML = tag + ' <span class="remove" onclick="this.parentElement.remove()">×</span>';
+            tc.appendChild(badge);
+          });
+        }
+        if (data.article.seoKeywords) {
+          const kc = document.getElementById('keywordContainer');
+          data.article.seoKeywords.forEach(kw => {
+            const badge = document.createElement('span');
+            badge.className = 'tag-badge';
+            badge.innerHTML = kw + ' <span class="remove" onclick="this.parentElement.remove()">×</span>';
+            kc.appendChild(badge);
+          });
+        }
+
+        // Sync classification fields
+        document.getElementById('articleCategory').value = category;
+        document.getElementById('articleType').value = articleType;
+        document.getElementById('articleLocation').value = location;
+        document.getElementById('isPillarContent').checked = isPillar;
+
+        // Update counters
+        ['articleTitle', 'articleExcerpt', 'seoMetaDescription'].forEach(id => {
+          document.getElementById(id)?.dispatchEvent(new Event('input'));
+        });
+
+        status.className = 'mt-2 small text-success';
+        status.textContent = 'Content generated! ' + (data.usage ? 'Tokens: ' + (data.usage.totalTokens || 'N/A') : '') + (data.entityCount ? ' | Entities: ' + data.entityCount : '');
+      } else {
+        status.className = 'mt-2 small text-danger';
+        status.textContent = 'Generation failed: ' + (data.error || data.message || 'Unknown error');
+      }
+    } catch (err) {
+      status.className = 'mt-2 small text-danger';
+      status.textContent = 'Error: ' + err.message;
+    }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-magic me-1"></i> Generate with AI';
+  });
+
+  // ==========================================
+  // Collect Tags/Keywords from UI
+  // ==========================================
+  function collectBadges(containerId) {
+    return Array.from(document.getElementById(containerId).querySelectorAll('.tag-badge'))
+      .map(b => b.textContent.replace('×', '').trim())
+      .filter(Boolean);
+  }
+
+  // ==========================================
+  // Save Article
+  // ==========================================
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('saveBtn');
+    const isEdit = document.getElementById('isEditMode').value === 'true';
+    const articleId = document.getElementById('articleId').value;
+
+    const data = {
+      title: document.getElementById('articleTitle').value,
+      slug: document.getElementById('articleSlug').value || undefined,
+      content: quill.root.innerHTML,
+      excerpt: document.getElementById('articleExcerpt').value,
+      featuredImage: document.getElementById('featuredImageUrl').value || document.getElementById('imageUrlInput').value || null,
+      category: document.getElementById('articleCategory').value,
+      articleType: document.getElementById('articleType').value,
+      location: document.getElementById('articleLocation').value,
+      status: document.getElementById('articleStatus').value,
+      isFeatured: document.getElementById('isFeatured').checked,
+      isPillarContent: document.getElementById('isPillarContent').checked,
+      pillarContentId: document.getElementById('pillarContentId').value || null,
+      topicCluster: document.getElementById('topicCluster').value || null,
+      primaryKeyword: document.getElementById('primaryKeyword').value || null,
+      seoMetaDescription: document.getElementById('seoMetaDescription').value,
+      tags: JSON.stringify(collectBadges('tagContainer')),
+      seoKeywords: JSON.stringify(collectBadges('keywordContainer'))
+    };
+
+    if (!data.title) { alert('Title is required'); return; }
+    if (!data.content || data.content === '<p><br></p>') { alert('Content is required'); return; }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+
+    try {
+      const url = isEdit ? '/api/articles/' + articleId : '/api/articles';
+      const method = isEdit ? 'PUT' : 'POST';
+      const res = await fetch(url, {
+        method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      if (result.success) {
+        if (!isEdit && result.article?.id) {
+          // Redirect to edit mode for new articles
+          window.location.href = '/admin/articles/edit/' + result.article.id;
+        } else {
+          alert('Article saved!');
+        }
+      } else { alert('Save failed: ' + (result.message || 'Unknown error')); }
+    } catch (err) { alert('Save error: ' + err.message); }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="bi bi-floppy me-1"></i> Save';
+  });
+
+  // ==========================================
+  // Publish Button
+  // ==========================================
+  document.getElementById('publishBtn')?.addEventListener('click', async () => {
+    if (!confirm('Publish this article?')) return;
+    const id = document.getElementById('articleId').value;
+    const res = await fetch('/api/articles/' + id + '/publish', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('articleStatus').value = 'published';
+      document.getElementById('publishBtn').disabled = true;
+      alert('Article published!');
+    } else { alert('Publish failed: ' + (data.message || 'Error')); }
+  });
+
+  // ==========================================
+  // Preview
+  // ==========================================
+  document.getElementById('previewBtn').addEventListener('click', () => {
+    const content = quill.root.innerHTML;
+    const title = document.getElementById('articleTitle').value;
+    const w = window.open('', '_blank');
+    w.document.write('<html><head><title>Preview: ' + title + '</title>');
+    w.document.write('<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">');
+    w.document.write('<style>body{max-width:800px;margin:40px auto;padding:0 20px;font-family:Georgia,serif;}h1{font-size:2rem;}img{max-width:100%;height:auto;}</style>');
+    w.document.write('</head><body>');
+    w.document.write('<h1>' + title + '</h1><hr>');
+    w.document.write(content);
+    w.document.write('</body></html>');
+    w.document.close();
+  });
+</script>
+` }) %>

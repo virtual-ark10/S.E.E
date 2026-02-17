@@ -1,0 +1,57 @@
+{
+  "domain": "car-hire",
+  "platformName": "AutoRent",
+  "baseUrl": "https://autorent.ae",
+  "entityType": "rental company",
+  "entityPlural": "rental companies",
+  "defaultLocation": "Dubai",
+  "fieldMappings": {
+    "name": "companyName",
+    "location": "city",
+    "rating": "customerRating",
+    "description": "about",
+    "categories": "vehicleTypes"
+  },
+  "categoryHierarchy": {
+    "luxury": { "children": ["sports-car", "limousine"], "direct": ["Luxury rental"] },
+    "economy": { "children": ["compact", "hatchback"], "direct": ["Economy rental"] }
+  },
+  "directCategoryMap": {
+    "suv": ["SUV", "4x4", "Off-road"],
+    "sedan": ["Sedan", "Saloon"],
+    "sports-car": ["Sports car", "Convertible"],
+    "compact": ["Compact", "Small car"]
+  },
+  "articleCategories": ["guides", "reviews", "comparisons", "tips"],
+  "articleTypes": ["guide", "listicle", "review", "comparison"],
+  "categoryOverrides": {
+    "guides": {
+      "categorySpecificInstructions": "Focus on comprehensive guides with comparisons and pricing info.",
+      "suggestedSections": ["Overview", "Key Features", "Pricing", "Tips"]
+    }
+  },
+  "cta": {
+    "enabled": true,
+    "mainCTA": {
+      "heading": "Find Your Perfect Rental",
+      "subheading": "Compare the best deals from top rental companies",
+      "buttonText": "Browse Rentals",
+      "buttonUrl": "https://autorent.ae/browse"
+    },
+    "entityCTA": {
+      "buttonText": "View {{ENTITY_NAME}} Fleet",
+      "buttonUrl": "https://autorent.ae/company/{{ENTITY_SLUG}}"
+    }
+  },
+  "promptVariables": {
+    "PLATFORM_NAME": "AutoRent",
+    "ENTITY_TYPE": "rental company",
+    "ENTITY_PLURAL": "rental companies",
+    "INDUSTRY_CONTEXT": "vehicle rental and car hire in Dubai, UAE",
+    "DEFAULT_LOCATION": "Dubai"
+  },
+  "integrations": {
+    "googleIndexing": { "enabled": false, "credentialsPath": "./gsc-credentials.json" },
+    "imageUpload": { "provider": "local", "localPath": "./uploads/images" }
+  }
+}

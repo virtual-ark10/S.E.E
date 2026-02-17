@@ -1,0 +1,86 @@
+{
+  "domain": "restaurants",
+  "platformName": "MySEO",
+  "baseUrl": "http://localhost:4000",
+  "entityType": "restaurant",
+  "entityPlural": "restaurants",
+  "defaultLocation": "Nairobi",
+  "fieldMappings": {
+    "name": "name",
+    "location": "location",
+    "rating": "rating",
+    "description": "description",
+    "categories": "categories"
+  },
+  "categoryHierarchy": {
+    "fast-food": {
+      "children": ["pizza", "burger"],
+      "direct": ["Fast food restaurant", "Fast food"]
+    },
+    "asian": {
+      "children": ["chinese", "japanese", "thai", "indian"],
+      "direct": ["Asian restaurant"]
+    }
+  },
+  "directCategoryMap": {
+    "pizza": ["Pizza restaurant", "Italian restaurant"],
+    "burger": ["Burger restaurant", "Hamburger restaurant"],
+    "chinese": ["Chinese restaurant"],
+    "japanese": ["Japanese restaurant", "Sushi restaurant"],
+    "thai": ["Thai restaurant"],
+    "indian": ["Indian restaurant"],
+    "coffee": ["Coffee shop", "Cafe"],
+    "italian": ["Italian restaurant", "Pizza restaurant"],
+    "seafood": ["Seafood restaurant"]
+  },
+  "articleCategories": ["guides", "reviews", "comparisons", "tips", "lists"],
+  "articleTypes": ["guide", "listicle", "review", "comparison"],
+  "categoryOverrides": {
+    "guides": {
+      "categorySpecificInstructions": "Focus on comprehensive guides. Include history, key features, and comparisons.",
+      "suggestedSections": ["Overview", "Key Features", "Comparisons", "Tips"]
+    },
+    "reviews": {
+      "categorySpecificInstructions": "Focus on detailed reviews with pros and cons. Include ratings and direct comparisons.",
+      "suggestedSections": ["Overview", "Pros", "Cons", "Rating", "Verdict"]
+    }
+  },
+  "cta": {
+    "enabled": true,
+    "mainCTA": {
+      "heading": "Discover Top Options",
+      "subheading": "Browse our curated selection",
+      "buttonText": "Browse Now",
+      "buttonUrl": "/"
+    },
+    "entityCTA": {
+      "buttonText": "Learn More About {{ENTITY_NAME}}",
+      "buttonUrl": "/entity/{{ENTITY_SLUG}}"
+    }
+  },
+  "promptVariables": {
+    "PLATFORM_NAME": "MySEO",
+    "ENTITY_TYPE": "restaurant",
+    "ENTITY_PLURAL": "restaurants",
+    "INDUSTRY_CONTEXT": "dining and food in Nairobi",
+    "DEFAULT_LOCATION": "Nairobi"
+  },
+  "integrations": {
+    "googleIndexing": {
+      "enabled": false,
+      "credentialsPath": "./gsc-credentials.json"
+    },
+    "keywordPlanner": {
+      "enabled": true
+    },
+    "imageUpload": {
+      "provider": "local",
+      "localPath": "./uploads/images",
+      "cloudinary": {
+        "cloudName": "",
+        "apiKey": "",
+        "apiSecret": ""
+      }
+    }
+  }
+}

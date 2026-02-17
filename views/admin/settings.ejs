@@ -1,0 +1,186 @@
+<%- include('../partials/header', { title: 'Settings', extraCSS: '' }) %>
+
+<h3 class="mb-4"><i class="bi bi-sliders"></i> Settings</h3>
+
+<div class="row">
+  <!-- General Settings -->
+  <div class="col-lg-6 mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold"><i class="bi bi-gear"></i> General</div>
+      <div class="card-body">
+        <form id="generalForm">
+          <div class="mb-3">
+            <label class="form-label">Platform Name</label>
+            <input type="text" class="form-control" name="platformName" value="<%= config.platformName %>">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Base URL</label>
+            <input type="url" class="form-control" name="baseUrl" value="<%= config.baseUrl %>">
+          </div>
+          <div class="row">
+            <div class="col-6 mb-3">
+              <label class="form-label">Entity Type</label>
+              <input type="text" class="form-control" name="entityType" value="<%= config.entityType %>">
+              <div class="form-text">Singular (e.g., "restaurant")</div>
+            </div>
+            <div class="col-6 mb-3">
+              <label class="form-label">Entity Plural</label>
+              <input type="text" class="form-control" name="entityPlural" value="<%= config.entityPlural %>">
+              <div class="form-text">Plural (e.g., "restaurants")</div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Default Location</label>
+            <input type="text" class="form-control" name="defaultLocation" value="<%= config.defaultLocation %>">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Domain</label>
+            <input type="text" class="form-control" name="domain" value="<%= config.domain %>">
+            <div class="form-text">Vertical identifier (e.g., "restaurants", "car-hire")</div>
+          </div>
+          <button type="submit" class="btn btn-primary">Save General Settings</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Settings -->
+  <div class="col-lg-6 mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold"><i class="bi bi-megaphone"></i> CTA Configuration</div>
+      <div class="card-body">
+        <form id="ctaForm">
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" name="enabled" id="ctaEnabled" <%= config.cta?.enabled ? 'checked' : '' %>>
+            <label class="form-check-label" for="ctaEnabled">Enable CTA buttons in articles</label>
+          </div>
+          <h6>Main CTA</h6>
+          <div class="mb-2"><input type="text" class="form-control form-control-sm" name="mainHeading" value="<%= config.cta?.mainCTA?.heading || '' %>" placeholder="Heading"></div>
+          <div class="mb-2"><input type="text" class="form-control form-control-sm" name="mainSubheading" value="<%= config.cta?.mainCTA?.subheading || '' %>" placeholder="Subheading (optional)"></div>
+          <div class="row mb-3">
+            <div class="col-6"><input type="text" class="form-control form-control-sm" name="mainButtonText" value="<%= config.cta?.mainCTA?.buttonText || '' %>" placeholder="Button Text"></div>
+            <div class="col-6"><input type="text" class="form-control form-control-sm" name="mainButtonUrl" value="<%= config.cta?.mainCTA?.buttonUrl || '' %>" placeholder="Button URL"></div>
+          </div>
+          <h6>Entity CTA</h6>
+          <div class="mb-2"><input type="text" class="form-control form-control-sm" name="entityButtonText" value="<%= config.cta?.entityCTA?.buttonText || '' %>" placeholder="Button Text (use {{ENTITY_NAME}})"></div>
+          <div class="mb-3"><input type="text" class="form-control form-control-sm" name="entityButtonUrl" value="<%= config.cta?.entityCTA?.buttonUrl || '' %>" placeholder="Button URL (use {{ENTITY_SLUG}})"></div>
+          <button type="submit" class="btn btn-primary">Save CTA Settings</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prompt Variables -->
+  <div class="col-lg-6 mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold"><i class="bi bi-braces"></i> Prompt Variables</div>
+      <div class="card-body">
+        <form id="promptForm">
+          <div class="mb-3">
+            <label class="form-label small">INDUSTRY_CONTEXT</label>
+            <input type="text" class="form-control form-control-sm" name="INDUSTRY_CONTEXT" value="<%= config.promptVariables?.INDUSTRY_CONTEXT || '' %>" placeholder="e.g., food and dining in Kenya">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small">Custom AI System Prompt (optional)</label>
+            <textarea class="form-control form-control-sm" name="aiSystemPromptTemplate" rows="6" placeholder="Leave empty for default"><%= config.aiSystemPromptTemplate || '' %></textarea>
+            <div class="form-text">Use {{PLATFORM_NAME}}, {{ENTITY_TYPE}}, etc. as placeholders</div>
+          </div>
+          <button type="submit" class="btn btn-primary">Save Prompt Settings</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categories -->
+  <div class="col-lg-6 mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold"><i class="bi bi-tags"></i> Article Categories</div>
+      <div class="card-body">
+        <form id="categoryForm">
+          <div class="mb-3">
+            <label class="form-label">Categories (comma-separated)</label>
+            <input type="text" class="form-control" name="articleCategories" value="<%= (config.articleCategories || []).join(', ') %>">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Article Types (comma-separated)</label>
+            <input type="text" class="form-control" name="articleTypes" value="<%= (config.articleTypes || []).join(', ') %>">
+          </div>
+          <button type="submit" class="btn btn-primary">Save Categories</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Raw Config -->
+  <div class="col-12 mb-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold d-flex justify-content-between">
+        <span><i class="bi bi-code-slash"></i> Raw Configuration</span>
+        <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('rawConfig').classList.toggle('d-none')">Toggle</button>
+      </div>
+      <div class="card-body d-none" id="rawConfig">
+        <pre class="bg-light p-3 rounded small" style="max-height: 400px; overflow: auto;"><%= configJSON %></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer', { extraJS: `
+<script>
+  async function submitSettings(formId, endpoint) {
+    const form = document.getElementById(formId);
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      const res = await fetch('/api/settings/' + endpoint, {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data)
+      });
+      const result = await res.json();
+      alert(result.success ? 'Settings saved!' : (result.message || 'Error'));
+    });
+  }
+
+  // General settings
+  submitSettings('generalForm', 'general');
+
+  // CTA settings
+  document.getElementById('ctaForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const data = {
+      enabled: document.getElementById('ctaEnabled').checked,
+      mainCTA: { heading: f.get('mainHeading'), subheading: f.get('mainSubheading'), buttonText: f.get('mainButtonText'), buttonUrl: f.get('mainButtonUrl') },
+      entityCTA: { buttonText: f.get('entityButtonText'), buttonUrl: f.get('entityButtonUrl') }
+    };
+    const res = await fetch('/api/settings/cta', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+    const result = await res.json();
+    alert(result.success ? 'CTA settings saved!' : (result.message || 'Error'));
+  });
+
+  // Prompt settings
+  document.getElementById('promptForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const data = {
+      promptVariables: { INDUSTRY_CONTEXT: f.get('INDUSTRY_CONTEXT') },
+      aiSystemPromptTemplate: f.get('aiSystemPromptTemplate') || undefined
+    };
+    const res = await fetch('/api/settings/prompts', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+    const result = await res.json();
+    alert(result.success ? 'Prompt settings saved!' : (result.message || 'Error'));
+  });
+
+  // Category settings
+  document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = new FormData(e.target);
+    const data = {
+      articleCategories: f.get('articleCategories').split(',').map(s => s.trim()).filter(Boolean),
+      articleTypes: f.get('articleTypes').split(',').map(s => s.trim()).filter(Boolean)
+    };
+    const res = await fetch('/api/settings/categories', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(data) });
+    const result = await res.json();
+    alert(result.success ? 'Category settings saved!' : (result.message || 'Error'));
+  });
+</script>
+` }) %>

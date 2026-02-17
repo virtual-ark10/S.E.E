@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Environment and secrets
+.env
+.env.local
+*.pem
+gsc-credentials.json
+
+# Uploads and generated
+uploads/
+*.log
+error.log
+combined.log
+
+# OS and IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build / cache
+dist/
+.cache/

@@ -1,0 +1,52 @@
+{
+  "domain": "vacation-rentals",
+  "platformName": "StayFinder",
+  "baseUrl": "https://stayfinder.com",
+  "entityType": "property",
+  "entityPlural": "properties",
+  "defaultLocation": "Bali",
+  "fieldMappings": {
+    "name": "propertyName",
+    "location": "area",
+    "rating": "guestRating",
+    "description": "about",
+    "categories": "propertyTypes"
+  },
+  "categoryHierarchy": {
+    "villa": { "children": ["pool-villa", "beachfront-villa"], "direct": ["Villa", "Luxury villa"] },
+    "apartment": { "children": ["studio", "penthouse"], "direct": ["Apartment", "Flat"] }
+  },
+  "directCategoryMap": {
+    "pool-villa": ["Pool villa", "Private pool"],
+    "beachfront-villa": ["Beachfront", "Ocean view"],
+    "studio": ["Studio apartment"],
+    "penthouse": ["Penthouse", "Top floor"]
+  },
+  "articleCategories": ["guides", "reviews", "area-guides", "tips"],
+  "articleTypes": ["guide", "listicle", "review", "comparison"],
+  "categoryOverrides": {},
+  "cta": {
+    "enabled": true,
+    "mainCTA": {
+      "heading": "Find Your Dream Stay",
+      "subheading": "Browse curated vacation rentals",
+      "buttonText": "Search Properties",
+      "buttonUrl": "https://stayfinder.com/search"
+    },
+    "entityCTA": {
+      "buttonText": "View {{ENTITY_NAME}}",
+      "buttonUrl": "https://stayfinder.com/property/{{ENTITY_SLUG}}"
+    }
+  },
+  "promptVariables": {
+    "PLATFORM_NAME": "StayFinder",
+    "ENTITY_TYPE": "property",
+    "ENTITY_PLURAL": "properties",
+    "INDUSTRY_CONTEXT": "vacation rentals and holiday accommodations in Bali, Indonesia",
+    "DEFAULT_LOCATION": "Bali"
+  },
+  "integrations": {
+    "googleIndexing": { "enabled": false, "credentialsPath": "./gsc-credentials.json" },
+    "imageUpload": { "provider": "local", "localPath": "./uploads/images" }
+  }
+}

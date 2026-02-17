@@ -1,0 +1,119 @@
+<!-- Dashboard Sidebar -->
+<aside class="dashboard-sidebar" id="dashboardSidebar">
+  <div class="sidebar-content">
+    <!-- Sidebar Header -->
+    <div class="sidebar-header">
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="sidebar-brand">
+          <i class="bi bi-gear-wide-connected"></i>
+          <span class="sidebar-brand-text">S.E.E</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarCollapse" title="Toggle Sidebar">
+          <i class="bi bi-chevron-left" id="collapseIcon"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar-nav">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="/admin">
+            <i class="bi bi-speedometer2"></i>
+            <span class="sidebar-text">Dashboard</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/articles">
+            <i class="bi bi-file-earmark-text"></i>
+            <span class="sidebar-text">Articles</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/articles/new">
+            <i class="bi bi-plus-circle"></i>
+            <span class="sidebar-text">New Article</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/entities">
+            <i class="bi bi-database"></i>
+            <span class="sidebar-text"><%= typeof config !== 'undefined' ? (config.entityPlural || 'Entities') : 'Entities' %></span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/entities/import">
+            <i class="bi bi-upload"></i>
+            <span class="sidebar-text">Import CSV</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/keywords">
+            <i class="bi bi-search"></i>
+            <span class="sidebar-text">Keyword Research</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/admin/settings">
+            <i class="bi bi-sliders"></i>
+            <span class="sidebar-text">Settings</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="nav-divider"></div>
+
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link" href="/blog" target="_blank">
+            <i class="bi bi-globe"></i>
+            <span class="sidebar-text">View Blog</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/sitemap.xml" target="_blank">
+            <i class="bi bi-diagram-3"></i>
+            <span class="sidebar-text">Sitemap</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+      <a href="/blog" target="_blank" class="btn btn-outline-light btn-sm w-100">
+        <i class="bi bi-box-arrow-up-right me-1"></i>
+        <span class="sidebar-text">View Blog</span>
+      </a>
+    </div>
+  </div>
+</aside>
+
+<!-- Mobile Bottom Navigation -->
+<nav class="mobile-bottom-nav d-xl-none">
+  <div class="bottom-nav-content">
+    <a href="/admin" class="nav-item">
+      <i class="bi bi-speedometer2"></i>
+      <span>Dashboard</span>
+    </a>
+    <a href="/admin/articles" class="nav-item">
+      <i class="bi bi-file-earmark-text"></i>
+      <span>Articles</span>
+    </a>
+    <a href="/admin/articles/new" class="nav-item create-btn">
+      <i class="bi bi-plus-circle"></i>
+    </a>
+    <a href="/admin/entities" class="nav-item">
+      <i class="bi bi-database"></i>
+      <span>Entities</span>
+    </a>
+    <a href="/admin/keywords" class="nav-item">
+      <i class="bi bi-search"></i>
+      <span>Keywords</span>
+    </a>
+    <a href="/admin/settings" class="nav-item">
+      <i class="bi bi-sliders"></i>
+      <span>Settings</span>
+    </a>
+  </div>
+</nav>

@@ -1,0 +1,127 @@
+<%- include('../partials/header', { title: title, extraCSS: '' }) %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3><i class="bi bi-search"></i> Keyword Research</h3>
+  <span class="badge <%= keywordPlannerStatus.configured ? 'bg-success' : 'bg-secondary' %>">
+    <%= keywordPlannerStatus.configured ? 'Connected' : 'Not configured' %>
+  </span>
+</div>
+
+<% if (!keywordPlannerStatus.configured) { %>
+  <div class="alert alert-info">
+    <strong>Google Keyword Planner</strong> is not configured. Add these to your <code>.env</code> and restart the server:
+    <ul class="mb-0 mt-2">
+      <li><code>GOOGLE_ADS_CLIENT_ID</code></li>
+      <li><code>GOOGLE_ADS_CLIENT_SECRET</code></li>
+      <li><code>GOOGLE_ADS_DEVELOPER_TOKEN</code> (from <a href="https://ads.google.com/aw/apicenter" target="_blank">Google Ads API Center</a>)</li>
+      <li><code>GOOGLE_ADS_REFRESH_TOKEN</code> (from OAuth flow)</li>
+      <li><code>GOOGLE_ADS_CUSTOMER_ID</code> (your Google Ads customer ID, e.g. 123-456-7890)</li>
+    </ul>
+    <p class="mb-0 mt-2 small">You need a <a href="https://ads.google.com" target="_blank">Google Ads account</a> (no need to run ads). Use the API to get keyword ideas and search volume.</p>
+  </div>
+<% } %>
+
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-header bg-white fw-bold"><i class="bi bi-lightbulb me-1"></i> Get keyword ideas</div>
+  <div class="card-body">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-5">
+        <label class="form-label small">Seed keyword(s)</label>
+        <input type="text" class="form-control" id="seedKeywords" placeholder="e.g. best coffee nairobi, micro saas ideas" />
+        <div class="form-text">Comma-separated. Used to generate related ideas + search volume.</div>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Max results</label>
+        <input type="number" class="form-control" id="pageSize" value="100" min="1" max="1000" />
+      </div>
+      <div class="col-md-2">
+        <button type="button" class="btn btn-primary w-100" id="fetchBtn" <%= !keywordPlannerStatus.configured ? 'disabled' : '' %>>
+          <i class="bi bi-search me-1"></i> Get ideas
+        </button>
+      </div>
+    </div>
+    <div id="keywordStatus" class="mt-2 small d-none"></div>
+  </div>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+    <span><i class="bi bi-list-ul me-1"></i> Results</span>
+    <span id="resultCount" class="text-muted small">0 keywords</span>
+  </div>
+  <div class="card-body p-0">
+    <div id="keywordResultsPlaceholder" class="text-center py-5 text-muted">
+      <i class="bi bi-search display-4"></i>
+      <p class="mt-2">Enter seed keywords and click &quot;Get ideas&quot;.</p>
+    </div>
+    <div id="keywordResultsTable" class="d-none">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th>Keyword</th>
+              <th class="text-end">Avg. monthly searches</th>
+              <th>Competition</th>
+            </tr>
+          </thead>
+          <tbody id="keywordResultsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer', { extraJS: `
+<script>
+  document.getElementById('fetchBtn').addEventListener('click', async () => {
+    const input = document.getElementById('seedKeywords').value.trim();
+    if (!input) { alert('Enter at least one seed keyword'); return; }
+    const seeds = input.split(',').map(s => s.trim()).filter(Boolean);
+    const pageSize = parseInt(document.getElementById('pageSize').value, 10) || 100;
+
+    const btn = document.getElementById('fetchBtn');
+    const status = document.getElementById('keywordStatus');
+    const placeholder = document.getElementById('keywordResultsPlaceholder');
+    const table = document.getElementById('keywordResultsTable');
+    const tbody = document.getElementById('keywordResultsBody');
+    const countEl = document.getElementById('resultCount');
+
+    btn.disabled = true;
+    status.classList.remove('d-none', 'text-danger', 'text-success');
+    status.className = 'mt-2 small text-info';
+    status.textContent = 'Fetching from Keyword Planner...';
+
+    try {
+      const res = await fetch('/api/keywords/ideas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ seedKeywords: seeds, pageSize })
+      });
+      const data = await res.json();
+
+      if (data.success && data.keywords && data.keywords.length > 0) {
+        placeholder.classList.add('d-none');
+        table.classList.remove('d-none');
+        tbody.innerHTML = data.keywords.map(k => '<tr><td>' + (k.text || '') + '</td><td class="text-end">' + (k.avgMonthlySearches ?? 0) + '</td><td><span class="badge bg-secondary">' + (k.competition || '') + '</span></td></tr>').join('');
+        countEl.textContent = data.keywords.length + ' keywords';
+        status.className = 'mt-2 small text-success';
+        status.textContent = 'Done.';
+      } else if (data.success && (!data.keywords || data.keywords.length === 0)) {
+        placeholder.classList.remove('d-none');
+        table.classList.add('d-none');
+        placeholder.innerHTML = '<i class="bi bi-inbox display-4"></i><p class="mt-2">No ideas returned. Try different seeds or check your Google Ads setup.</p>';
+        countEl.textContent = '0 keywords';
+        status.className = 'mt-2 small text-warning';
+        status.textContent = 'No results.';
+      } else {
+        status.className = 'mt-2 small text-danger';
+        status.textContent = data.error || 'Request failed';
+      }
+    } catch (err) {
+      status.className = 'mt-2 small text-danger';
+      status.textContent = 'Error: ' + err.message;
+    }
+    btn.disabled = false;
+  });
+</script>
+` }) %>

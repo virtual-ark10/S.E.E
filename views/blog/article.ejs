@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= seo.title %> | <%= config.platformName %></title>
+  <meta name="description" content="<%= seo.description %>">
+  <meta name="keywords" content="<%= seo.keywords %>">
+  <meta property="og:title" content="<%= seo.og.title %>">
+  <meta property="og:description" content="<%= seo.og.description %>">
+  <meta property="og:type" content="<%= seo.og.type %>">
+  <meta property="og:url" content="<%= seo.og.url %>">
+  <meta property="og:image" content="<%= seo.og.image %>">
+  <meta name="twitter:card" content="<%= seo.twitter.card %>">
+  <meta name="twitter:title" content="<%= seo.twitter.title %>">
+  <meta name="twitter:description" content="<%= seo.twitter.description %>">
+  <link rel="canonical" href="<%= seo.canonical %>">
+  <!-- Google Fonts - Nunito -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #ff1844;
+      --accent-dark: #e0153a;
+      --accent-light: #ff6b8a;
+      --text-primary: #2d3436;
+      --text-secondary: #636e72;
+      --text-muted: #b2bec3;
+      --bg: #f6f6f6;
+      --surface: #ffffff;
+      --border: #e0e0e0;
+    }
+    body {
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #fff;
+      color: var(--text-primary);
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-dark); }
+
+    /* Breadcrumb Bar */
+    .breadcrumb-bar {
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 0;
+    }
+    .breadcrumb-bar .breadcrumb {
+      font-size: 0.9rem;
+      margin: 0;
+    }
+    .breadcrumb-bar .breadcrumb a {
+      color: var(--text-secondary);
+    }
+    .breadcrumb-bar .breadcrumb a:hover {
+      color: var(--accent);
+    }
+
+    /* Article Header */
+    .article-header {
+      padding: 3rem 0 2rem;
+    }
+    .article-header h1 {
+      font-weight: 800;
+      font-size: 2.5rem;
+      line-height: 1.2;
+      color: var(--text-primary);
+    }
+    .article-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+    .article-meta i {
+      color: var(--accent);
+      margin-right: 0.35rem;
+    }
+
+    /* Article Content */
+    .article-content {
+      font-size: 1.125rem;
+      line-height: 1.8;
+      color: #333;
+    }
+    .article-content h2 {
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .article-content h3 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .article-content p { margin-bottom: 1.25rem; }
+    .article-content ul, .article-content ol { margin-bottom: 1.25rem; padding-left: 1.5rem; }
+    .article-content li { margin-bottom: 0.5rem; }
+    .article-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+      margin: 1.5rem 0;
+    }
+    .article-content blockquote {
+      border-left: 4px solid var(--accent);
+      padding-left: 1.5rem;
+      margin: 1.5rem 0;
+      font-style: italic;
+      color: #666;
+    }
+    .article-content a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .article-content a:hover {
+      color: var(--accent-dark);
+      text-decoration: underline;
+    }
+
+    /* Table of Contents */
+    .toc-card .card-header {
+      cursor: pointer;
+      background: var(--bg);
+    }
+    .toc-card .card-header:hover {
+      background: #eee;
+    }
+    .table-of-contents { font-size: 0.95rem; }
+    .table-of-contents ol { list-style-type: decimal; padding-left: 1.5rem; }
+    .table-of-contents a { color: var(--accent); transition: color 0.2s; text-decoration: none; }
+    .table-of-contents a:hover { color: var(--accent-dark); text-decoration: underline; }
+    .table-of-contents li { line-height: 1.6; }
+    #tocToggleIcon { transition: transform 0.3s; }
+    [data-bs-toggle="collapse"][aria-expanded="false"] #tocToggleIcon { transform: rotate(-90deg); }
+
+    /* Related Cards */
+    .related-card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+      transition: all 0.3s ease;
+    }
+    .related-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    }
+    .related-card img {
+      height: 140px;
+      object-fit: cover;
+    }
+    .related-card .card-title a {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    .related-card .card-title a:hover {
+      color: var(--accent);
+    }
+
+    /* Tags */
+    .tag-pill {
+      display: inline-block;
+      background: var(--bg);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .tag-pill:hover {
+      background: rgba(255, 24, 68, 0.1);
+      color: var(--accent);
+      border-color: var(--accent);
+      text-decoration: none;
+    }
+
+    /* Share Buttons */
+    .share-btn {
+      border-radius: 20px;
+      font-weight: 600;
+      padding: 0.5rem 1.25rem;
+    }
+
+    /* CTA Section */
+    .blog-cta {
+      background: linear-gradient(135deg, #ff1844 0%, #ff6b8a 100%);
+      color: white;
+      padding: 3rem 0;
+    }
+
+    /* Footer */
+    .blog-footer {
+      background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+      color: white;
+      padding: 3rem 0 1.5rem;
+    }
+    .blog-footer a { color: rgba(255,255,255,0.8); text-decoration: none; }
+    .blog-footer a:hover { color: var(--accent-light); text-decoration: underline; }
+    .footer-bottom {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .btn-primary:hover {
+      background: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+    .btn-outline-primary {
+      color: var(--accent);
+      border-color: var(--accent);
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .btn-outline-primary:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    /* Badge */
+    .badge.bg-primary { background-color: var(--accent) !important; }
+
+    @media (max-width: 768px) {
+      .article-header h1 { font-size: 1.75rem; }
+      .article-meta { gap: 1rem; font-size: 0.875rem; }
+      .article-content { font-size: 1rem; }
+    }
+  </style>
+  <script type="application/ld+json"><%- JSON.stringify(articleSchema) %></script>
+  <script type="application/ld+json"><%- JSON.stringify(breadcrumbs) %></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/" style="color: var(--accent); font-size: 1.5rem;">
+      <i class="bi bi-gear-wide-connected me-2"></i><%= config.platformName %>
+    </a>
+    <div class="d-flex align-items-center gap-2">
+      <a href="/blog" class="btn btn-sm btn-outline-secondary" style="border-radius: 20px;">Blog</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-bar">
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/blog">Blog</a></li>
+        <li class="breadcrumb-item active" aria-current="page"><%= article.category %></li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<!-- Article -->
+<article class="py-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-10">
+        <!-- Article Header -->
+        <header class="article-header">
+          <!-- Category & Location -->
+          <div class="mb-3">
+            <% if (article.category) { %>
+              <span class="badge bg-primary me-2" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; border-radius: 20px;">
+                <%= article.category %>
+              </span>
+            <% } %>
+            <% if (article.location) { %>
+              <span class="badge bg-secondary" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; border-radius: 20px;">
+                <i class="bi bi-geo-alt me-1"></i><%= article.location %>
+              </span>
+            <% } %>
+            <% if (article.isPillarContent) { %>
+              <span class="badge bg-warning text-dark" style="font-size: 0.8rem; padding: 0.35rem 0.75rem; border-radius: 20px;">
+                <i class="bi bi-pin-angle me-1"></i>Pillar Guide
+              </span>
+            <% } %>
+          </div>
+
+          <!-- Title -->
+          <h1 class="mb-3"><%= article.title %></h1>
+
+          <!-- Meta Info -->
+          <div class="article-meta mb-4">
+            <span>
+              <i class="bi bi-calendar3"></i>
+              <%= article.publishedAt ? new Date(article.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '' %>
+            </span>
+            <% if (article.category) { %>
+              <span><i class="bi bi-tag"></i> <%= article.category %></span>
+            <% } %>
+            <% if (article.location) { %>
+              <span><i class="bi bi-geo-alt"></i> <%= article.location %></span>
+            <% } %>
+          </div>
+
+          <!-- Featured Image -->
+          <% if (article.featuredImage) { %>
+            <div class="mb-4">
+              <img src="<%= article.featuredImage %>"
+                   alt="<%= article.title %>"
+                   class="img-fluid rounded shadow-sm w-100"
+                   style="max-height: 500px; object-fit: cover;">
+            </div>
+          <% } %>
+        </header>
+
+        <!-- Table of Contents -->
+        <% if (toc && toc.length > 2) { %>
+          <div class="mb-4">
+            <div class="card toc-card border shadow-sm">
+              <div class="card-header d-flex justify-content-between align-items-center"
+                   data-bs-toggle="collapse"
+                   data-bs-target="#tableOfContents"
+                   aria-expanded="true"
+                   aria-controls="tableOfContents">
+                <h5 class="mb-0">
+                  <i class="bi bi-list-ul me-2"></i>Table of Contents
+                </h5>
+                <i class="bi bi-chevron-down" id="tocToggleIcon"></i>
+              </div>
+              <div class="collapse show" id="tableOfContents">
+                <div class="card-body">
+                  <nav class="table-of-contents">
+                    <ol class="mb-0 ps-3">
+                      <% toc.forEach(item => { %>
+                        <li class="mb-2">
+                          <a href="#<%= item.id %>" class="toc-link"><%= item.text %></a>
+                          <% if (item.children && item.children.length > 0) { %>
+                            <ol class="mt-1">
+                              <% item.children.forEach(child => { %>
+                                <li class="mb-1">
+                                  <a href="#<%= child.id %>" class="toc-link" style="color: var(--text-secondary);"><%= child.text %></a>
+                                </li>
+                              <% }) %>
+                            </ol>
+                          <% } %>
+                        </li>
+                      <% }) %>
+                    </ol>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Article Content -->
+        <div class="article-content">
+          <%- article.content %>
+        </div>
+
+        <!-- Tags -->
+        <% if (article.tags && article.tags.length > 0) { %>
+          <div class="mt-5 pt-4 border-top">
+            <h5 class="mb-3">Tags</h5>
+            <div class="d-flex flex-wrap gap-2">
+              <% article.tags.forEach(tag => { %>
+                <a href="/blog?tag=<%= tag %>" class="tag-pill">#<%= tag %></a>
+              <% }) %>
+            </div>
+          </div>
+        <% } %>
+
+        <!-- Share Section -->
+        <div class="mt-5 pt-4 border-top text-center">
+          <h5 class="mb-3">Share This Article</h5>
+          <div class="d-flex gap-2 justify-content-center flex-wrap">
+            <a href="https://www.facebook.com/sharer/sharer.php?u=<%= seo.canonical %>"
+               target="_blank"
+               class="btn btn-outline-primary share-btn">
+              <i class="bi bi-facebook me-1"></i>Facebook
+            </a>
+            <a href="https://twitter.com/intent/tweet?url=<%= seo.canonical %>&text=<%= encodeURIComponent(article.title) %>"
+               target="_blank"
+               class="btn btn-outline-info share-btn">
+              <i class="bi bi-twitter me-1"></i>Twitter
+            </a>
+            <a href="https://wa.me/?text=<%= encodeURIComponent(article.title + ' - ' + seo.canonical) %>"
+               target="_blank"
+               class="btn btn-outline-success share-btn">
+              <i class="bi bi-whatsapp me-1"></i>WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+<!-- Related Articles -->
+<% if (relatedArticles && relatedArticles.length > 0) { %>
+  <section class="py-5" style="background: var(--bg);">
+    <div class="container">
+      <h2 class="mb-4 text-center fw-bold">Related Articles</h2>
+      <div class="row g-4 justify-content-center">
+        <% relatedArticles.slice(0, 3).forEach(related => { %>
+          <div class="col-md-4">
+            <div class="card related-card h-100">
+              <% if (related.featuredImage) { %>
+                <img src="<%= related.featuredImage %>" class="card-img-top" alt="<%= related.title %>">
+              <% } else { %>
+                <div class="card-img-top d-flex align-items-center justify-content-center"
+                     style="height: 140px; background: linear-gradient(135deg, #ff1844 0%, #ff6b8a 100%);">
+                  <i class="bi bi-file-text" style="font-size: 2.5rem; color: rgba(255,255,255,0.5);"></i>
+                </div>
+              <% } %>
+              <div class="card-body">
+                <span class="badge bg-primary mb-2" style="border-radius: 20px;"><%= related.category %></span>
+                <h6 class="card-title">
+                  <a href="/blog/<%= related.slug %>"><%= related.title %></a>
+                </h6>
+                <% if (related.excerpt) { %>
+                  <p class="card-text small" style="color: var(--text-secondary);">
+                    <%= related.excerpt.substring(0, 80) %><%= related.excerpt.length > 80 ? '...' : '' %>
+                  </p>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  </section>
+<% } %>
+
+<!-- CTA Section -->
+<section class="blog-cta text-center">
+  <div class="container">
+    <h2 class="mb-3 fw-bold">Explore More Content</h2>
+    <p class="lead mb-4" style="opacity: 0.9;">Browse our latest articles and guides</p>
+    <div class="d-flex gap-3 justify-content-center flex-wrap">
+      <a href="/blog" class="btn btn-light btn-lg" style="border-radius: 25px; font-weight: 600;">
+        <i class="bi bi-newspaper me-2"></i>All Articles
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="blog-footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <h5 class="fw-bold mb-3"><i class="bi bi-gear-wide-connected me-2"></i><%= config.platformName %></h5>
+        <p style="color: rgba(255,255,255,0.7); max-width: 400px;">Discover the best guides, reviews, and insights. Powered by S.E.E.</p>
+      </div>
+      <div class="col-md-3">
+        <h6 class="fw-bold mb-3">Quick Links</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="/blog">Blog</a></li>
+          <li class="mb-2"><a href="/">Home</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <h6 class="fw-bold mb-3">Resources</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="/sitemap.xml">Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="mb-0">&copy; <%= new Date().getFullYear() %> <%= config.platformName %>. Powered by S.E.E.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle TOC collapse icon rotation
+    const tocToggle = document.querySelector('[data-bs-target="#tableOfContents"]');
+    if (tocToggle) {
+      tocToggle.addEventListener('click', function() {
+        const icon = document.getElementById('tocToggleIcon');
+        const isExpanded = this.getAttribute('aria-expanded') === 'true';
+        if (icon) {
+          setTimeout(() => {
+            icon.style.transform = isExpanded ? 'rotate(-90deg)' : 'rotate(0deg)';
+          }, 10);
+        }
+      });
+    }
+
+    // Smooth scroll for TOC links
+    document.querySelectorAll('.toc-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href').substring(1);
+        const targetElement = document.getElementById(targetId);
+        if (targetElement) {
+          const offset = 80;
+          const elementPosition = targetElement.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - offset;
+          window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

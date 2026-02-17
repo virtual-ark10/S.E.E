@@ -1,0 +1,117 @@
+<%- include('../partials/header', { title: title, extraCSS: '' }) %>
+
+<h3 class="mb-4"><i class="bi bi-upload"></i> Import <%= config.entityPlural || 'Entities' %> from CSV</h3>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <form id="importForm" enctype="multipart/form-data">
+          <div class="mb-4">
+            <label class="form-label fw-semibold">CSV File</label>
+            <input type="file" class="form-control" id="csvFile" name="csv" accept=".csv" required>
+            <div class="form-text">Max 10MB. Must include a "name" column.</div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="importBtn">
+            <i class="bi bi-upload me-1"></i> Import
+          </button>
+        </form>
+
+        <!-- Progress -->
+        <div id="importProgress" class="mt-4 d-none">
+          <div class="progress mb-3">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%">Importing...</div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div id="importResults" class="mt-4 d-none">
+          <div class="alert" id="importAlert"></div>
+          <div id="importErrors" class="mt-2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold"><i class="bi bi-info-circle"></i> CSV Format</div>
+      <div class="card-body">
+        <p class="small text-muted">Your CSV should have columns for your entity data. The following columns are recognized:</p>
+        <table class="table table-sm small">
+          <tr><td><strong>name</strong> *</td><td>Entity name (required)</td></tr>
+          <tr><td>description</td><td>Description text</td></tr>
+          <tr><td>location</td><td>City or area</td></tr>
+          <tr><td>category</td><td>Primary category</td></tr>
+          <tr><td>categories</td><td>Comma-separated</td></tr>
+          <tr><td>rating</td><td>0-5 numeric</td></tr>
+          <tr><td>reviewCount</td><td>Number</td></tr>
+          <tr><td>phone</td><td>Phone number</td></tr>
+          <tr><td>website</td><td>URL</td></tr>
+          <tr><td>address</td><td>Full address</td></tr>
+          <tr><td>tags</td><td>Comma-separated</td></tr>
+        </table>
+        <p class="small text-muted mb-0">Column names are case-insensitive. Duplicates (by name) are automatically skipped.</p>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-header bg-white fw-bold"><i class="bi bi-download"></i> Sample CSV</div>
+      <div class="card-body">
+        <pre class="small bg-light p-2 rounded mb-2">name,location,category,rating,reviewCount
+"Example Business","New York","restaurants",4.5,120
+"Another Place","London","cafes",4.2,85</pre>
+        <button class="btn btn-outline-secondary btn-sm" onclick="downloadSample()"><i class="bi bi-download me-1"></i> Download Sample</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer', { extraJS: `
+<script>
+  document.getElementById('importForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const file = document.getElementById('csvFile').files[0];
+    if (!file) return;
+
+    document.getElementById('importProgress').classList.remove('d-none');
+    document.getElementById('importResults').classList.add('d-none');
+    document.getElementById('importBtn').disabled = true;
+
+    const formData = new FormData();
+    formData.append('csv', file);
+
+    try {
+      const res = await fetch('/api/entities/import-csv', { method: 'POST', body: formData });
+      const data = await res.json();
+
+      document.getElementById('importProgress').classList.add('d-none');
+      document.getElementById('importResults').classList.remove('d-none');
+      
+      const alert = document.getElementById('importAlert');
+      alert.className = 'alert ' + (data.success ? 'alert-success' : 'alert-danger');
+      alert.textContent = data.message;
+
+      if (data.errors && data.errors.length > 0) {
+        document.getElementById('importErrors').innerHTML = '<h6>Errors:</h6><ul class="small text-danger">' + 
+          data.errors.map(e => '<li>' + e + '</li>').join('') + '</ul>';
+      }
+    } catch (err) {
+      document.getElementById('importProgress').classList.add('d-none');
+      document.getElementById('importResults').classList.remove('d-none');
+      document.getElementById('importAlert').className = 'alert alert-danger';
+      document.getElementById('importAlert').textContent = 'Import failed: ' + err.message;
+    }
+    document.getElementById('importBtn').disabled = false;
+  });
+
+  function downloadSample() {
+    const csv = 'name,description,location,category,rating,reviewCount,phone,website,tags\\n"Sample Business","A great place","New York","restaurant",4.5,120,"+1234567890","https://example.com","food,dining"';
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'sample-entities.csv';
+    a.click();
+  }
+</script>
+` }) %>

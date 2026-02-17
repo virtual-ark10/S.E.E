@@ -1,0 +1,62 @@
+{
+  "domain": "restaurants",
+  "platformName": "FoodieHub",
+  "baseUrl": "https://foodiehub.co.ke",
+  "entityType": "restaurant",
+  "entityPlural": "restaurants",
+  "defaultLocation": "Nairobi",
+  "fieldMappings": {
+    "name": "name",
+    "location": "location",
+    "rating": "rating",
+    "description": "description",
+    "categories": "categories"
+  },
+  "categoryHierarchy": {
+    "fast-food": { "children": ["pizza", "burger", "fast-food"], "direct": ["Fast food restaurant"] },
+    "asian": { "children": ["chinese", "japanese", "thai", "indian"], "direct": ["Asian restaurant"] },
+    "african": { "children": ["ethiopian"], "direct": ["African restaurant"] }
+  },
+  "directCategoryMap": {
+    "pizza": ["Pizza restaurant", "Italian restaurant"],
+    "burger": ["Burger restaurant", "Hamburger restaurant"],
+    "chinese": ["Chinese restaurant"],
+    "japanese": ["Japanese restaurant", "Sushi restaurant"],
+    "indian": ["Indian restaurant", "Curry restaurant"],
+    "coffee": ["Coffee shop", "Cafe"],
+    "seafood": ["Seafood restaurant"],
+    "steakhouse": ["Steakhouse", "Steak restaurant"]
+  },
+  "articleCategories": ["food-guides", "reviews", "cuisine-guides", "dining-tips", "lists"],
+  "articleTypes": ["guide", "listicle", "review", "comparison"],
+  "categoryOverrides": {
+    "food-guides": {
+      "categorySpecificInstructions": "Focus on comprehensive food guides. Include restaurant recommendations, dish highlights, and local food culture.",
+      "suggestedSections": ["Top Picks", "Cuisine Types", "Price Ranges", "Local Tips"]
+    }
+  },
+  "cta": {
+    "enabled": true,
+    "mainCTA": {
+      "heading": "Discover Amazing Restaurants",
+      "subheading": "Find the best dining spots near you",
+      "buttonText": "Browse Restaurants",
+      "buttonUrl": "https://foodiehub.co.ke/browse"
+    },
+    "entityCTA": {
+      "buttonText": "View {{ENTITY_NAME}} Menu",
+      "buttonUrl": "https://foodiehub.co.ke/restaurant/{{ENTITY_SLUG}}"
+    }
+  },
+  "promptVariables": {
+    "PLATFORM_NAME": "FoodieHub",
+    "ENTITY_TYPE": "restaurant",
+    "ENTITY_PLURAL": "restaurants",
+    "INDUSTRY_CONTEXT": "dining, food, and restaurants in Nairobi, Kenya",
+    "DEFAULT_LOCATION": "Nairobi"
+  },
+  "integrations": {
+    "googleIndexing": { "enabled": false, "credentialsPath": "./gsc-credentials.json" },
+    "imageUpload": { "provider": "local", "localPath": "./uploads/images" }
+  }
+}

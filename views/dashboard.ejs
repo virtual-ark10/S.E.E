@@ -1,0 +1,182 @@
+<%- include('partials/header', { title: 'Dashboard', extraCSS: '' }) %>
+
+<div class="page-header mb-4">
+  <h2 class="mb-1" style="font-size: 2rem; font-weight: 700; color: #2d3436;">Dashboard</h2>
+  <p style="font-size: 1.1rem; color: #6c757d;">Welcome to your content engine</p>
+</div>
+
+<!-- Stats Row 1 -->
+<div class="row g-3 mb-4">
+  <div class="col-md-3 col-6">
+    <div class="stat-card stat-card-primary">
+      <div class="stat-card-content">
+        <div class="stat-card-icon"><i class="bi bi-file-earmark-text"></i></div>
+        <div class="stat-card-info-block">
+          <div class="stat-card-value"><%= stats.totalArticles %></div>
+          <div class="stat-card-title">Total Articles</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="stat-card stat-card-success">
+      <div class="stat-card-content">
+        <div class="stat-card-icon"><i class="bi bi-check-circle"></i></div>
+        <div class="stat-card-info-block">
+          <div class="stat-card-value"><%= stats.publishedArticles %></div>
+          <div class="stat-card-title">Published</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="stat-card stat-card-info">
+      <div class="stat-card-content">
+        <div class="stat-card-icon"><i class="bi bi-database"></i></div>
+        <div class="stat-card-info-block">
+          <div class="stat-card-value"><%= stats.totalEntities %></div>
+          <div class="stat-card-title"><%= config.entityPlural || 'Entities' %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3 col-6">
+    <div class="stat-card stat-card-warning">
+      <div class="stat-card-content">
+        <div class="stat-card-icon"><i class="bi bi-robot"></i></div>
+        <div class="stat-card-info-block">
+          <div class="stat-card-value"><%= stats.aiGeneratedCount %></div>
+          <div class="stat-card-title">AI Generated</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Row 2 -->
+<div class="row g-3 mb-4">
+  <div class="col-md-4 col-6">
+    <div class="stat-card stat-card-warning">
+      <div class="stat-card-content">
+        <div class="stat-card-icon"><i class="bi bi-pencil"></i></div>
+        <div class="stat-card-info-block">
+          <div class="stat-card-value"><%= stats.draftArticles %></div>
+          <div class="stat-card-title">Drafts</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="stat-card stat-card-secondary">
+      <div class="stat-card-content">
+        <div class="stat-card-icon"><i class="bi bi-archive"></i></div>
+        <div class="stat-card-info-block">
+          <div class="stat-card-value"><%= stats.archivedArticles %></div>
+          <div class="stat-card-title">Archived</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4 col-6">
+    <div class="stat-card stat-card-purple">
+      <div class="stat-card-content">
+        <div class="stat-card-icon"><i class="bi bi-pin-angle"></i></div>
+        <div class="stat-card-info-block">
+          <div class="stat-card-value"><%= stats.pillarArticles %></div>
+          <div class="stat-card-title">Pillar Articles</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-4">
+  <!-- Quick Actions -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold">
+        <i class="bi bi-lightning-charge" style="color: var(--see-primary);"></i> Quick Actions
+      </div>
+      <div class="card-body">
+        <div class="d-grid gap-2">
+          <a href="/admin/articles/new" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> New Article</a>
+          <a href="/admin/entities/import" class="btn btn-outline-primary"><i class="bi bi-upload me-1"></i> Import <%= config.entityPlural || 'Entities' %></a>
+          <a href="/admin/entities" class="btn btn-outline-secondary"><i class="bi bi-database me-1"></i> Manage <%= config.entityPlural || 'Entities' %></a>
+          <a href="/admin/settings" class="btn btn-outline-secondary"><i class="bi bi-sliders me-1"></i> Settings</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scheduler Status -->
+    <div class="card border-0 shadow-sm mt-3">
+      <div class="card-header bg-white fw-bold">
+        <i class="bi bi-clock" style="color: var(--see-primary);"></i> Scheduler
+      </div>
+      <div class="card-body">
+        <p class="mb-1">Status: <span class="badge <%= schedulerStatus.enabled ? 'bg-success' : 'bg-secondary' %>"><%= schedulerStatus.enabled ? 'Active' : 'Disabled' %></span></p>
+        <p class="mb-1 small text-muted"><%= schedulerStatus.generationSchedule %></p>
+        <p class="mb-0 small text-muted"><%= schedulerStatus.archivalSchedule %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Articles -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold">
+        <i class="bi bi-file-earmark-text" style="color: var(--see-primary);"></i> Recent Articles
+      </div>
+      <div class="card-body p-0">
+        <% if (recentArticles.length === 0) { %>
+          <p class="text-muted p-3 mb-0">No articles yet. <a href="/admin/articles/new">Create one!</a></p>
+        <% } else { %>
+          <div class="list-group list-group-flush">
+            <% recentArticles.forEach(article => { %>
+              <a href="/admin/articles/edit/<%= article._id %>" class="list-group-item list-group-item-action">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1 text-truncate" style="max-width: 200px;"><%= article.title %></h6>
+                  <small>
+                    <span class="badge badge-<%= article.status %>"><%= article.status %></span>
+                  </small>
+                </div>
+                <small class="text-muted">
+                  <%= article.category %> · <%= new Date(article.createdAt).toLocaleDateString() %>
+                  <% if (article.isAiGenerated) { %><i class="bi bi-robot ms-1" title="AI Generated"></i><% } %>
+                  <% if (article.isPillarContent) { %><i class="bi bi-pin-angle ms-1" title="Pillar"></i><% } %>
+                </small>
+              </a>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Entities -->
+  <div class="col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white fw-bold">
+        <i class="bi bi-database" style="color: var(--see-primary);"></i> Recent <%= config.entityPlural || 'Entities' %>
+      </div>
+      <div class="card-body p-0">
+        <% if (recentEntities.length === 0) { %>
+          <p class="text-muted p-3 mb-0">No <%= (config.entityPlural || 'entities').toLowerCase() %> yet. <a href="/admin/entities/import">Import some!</a></p>
+        <% } else { %>
+          <div class="list-group list-group-flush">
+            <% recentEntities.forEach(entity => { %>
+              <div class="list-group-item">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1"><%= entity.name %></h6>
+                  <% if (entity.rating > 0) { %><small class="text-warning"><%= Number(entity.rating).toFixed(1) %>★</small><% } %>
+                </div>
+                <small class="text-muted"><%= entity.location || '' %> <% if (entity.category) { %>· <%= entity.category %><% } %></small>
+              </div>
+            <% }) %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer', { extraJS: '' }) %>

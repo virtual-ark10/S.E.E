@@ -1,0 +1,132 @@
+<%- include('../partials/header', { title: 'Articles', extraCSS: '' }) %>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h3><i class="bi bi-file-earmark-text"></i> Articles</h3>
+  <a href="/admin/articles/new" class="btn btn-primary"><i class="bi bi-plus-circle me-1"></i> New Article</a>
+</div>
+
+<!-- Filters -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <form method="GET" class="row g-2 align-items-end">
+      <div class="col-md-3">
+        <label class="form-label small">Search</label>
+        <input type="text" name="search" class="form-control form-control-sm" value="<%= filters.search || '' %>" placeholder="Search articles...">
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Status</label>
+        <select name="status" class="form-select form-select-sm">
+          <option value="">All</option>
+          <option value="published" <%= filters.status === 'published' ? 'selected' : '' %>>Published</option>
+          <option value="draft" <%= filters.status === 'draft' ? 'selected' : '' %>>Draft</option>
+          <option value="archived" <%= filters.status === 'archived' ? 'selected' : '' %>>Archived</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <label class="form-label small">Category</label>
+        <select name="category" class="form-select form-select-sm">
+          <option value="">All</option>
+          <% categories.forEach(cat => { %>
+            <option value="<%= cat %>" <%= filters.category === cat ? 'selected' : '' %>><%= cat %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-sm btn-primary w-100">Filter</button>
+      </div>
+      <div class="col-md-1">
+        <a href="/admin/articles" class="btn btn-sm btn-outline-secondary w-100">Clear</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Articles Table -->
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    <% if (articles.length === 0) { %>
+      <div class="text-center py-5">
+        <i class="bi bi-file-earmark-text display-4 text-muted"></i>
+        <p class="mt-2 text-muted">No articles found</p>
+        <a href="/admin/articles/new" class="btn btn-primary btn-sm">Create your first article</a>
+      </div>
+    <% } else { %>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr><th>Title</th><th>Status</th><th>Category</th><th>Type</th><th>Views</th><th>Created</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            <% articles.forEach(article => { %>
+              <tr>
+                <td>
+                  <a href="/admin/articles/edit/<%= article._id %>" class="text-decoration-none fw-semibold">
+                    <%= article.title.length > 60 ? article.title.substring(0, 57) + '...' : article.title %>
+                  </a>
+                  <div class="small text-muted">
+                    <% if (article.isAiGenerated) { %><i class="bi bi-robot" title="AI"></i> <% } %>
+                    <% if (article.isPillarContent) { %><span class="badge bg-primary bg-opacity-25 text-primary">Pillar</span><% } %>
+                    /<%= article.slug %>
+                  </div>
+                </td>
+                <td><span class="badge badge-<%= article.status %>"><%= article.status %></span></td>
+                <td><%= article.category || '-' %></td>
+                <td><%= article.articleType || '-' %></td>
+                <td><%= article.viewCount || 0 %></td>
+                <td><small><%= new Date(article.createdAt).toLocaleDateString() %></small></td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <a href="/admin/articles/edit/<%= article._id %>" class="btn btn-outline-primary" title="Edit"><i class="bi bi-pencil"></i></a>
+                    <% if (article.status === 'published') { %>
+                      <a href="/blog/<%= article.slug %>" target="_blank" class="btn btn-outline-success" title="View"><i class="bi bi-eye"></i></a>
+                    <% } %>
+                    <% if (article.status === 'draft') { %>
+                      <button class="btn btn-outline-success btn-publish" data-id="<%= article._id %>" title="Publish"><i class="bi bi-check"></i></button>
+                    <% } %>
+                    <button class="btn btn-outline-danger btn-delete" data-id="<%= article._id %>" title="Delete"><i class="bi bi-trash"></i></button>
+                  </div>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Pagination -->
+<% if (pagination.pages > 1) { %>
+  <nav class="mt-3">
+    <ul class="pagination justify-content-center">
+      <% for (let i = 1; i <= pagination.pages; i++) { %>
+        <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
+          <a class="page-link" href="?page=<%= i %>&status=<%= filters.status || '' %>&category=<%= filters.category || '' %>&search=<%= filters.search || '' %>"><%= i %></a>
+        </li>
+      <% } %>
+    </ul>
+  </nav>
+<% } %>
+
+<%- include('../partials/footer', { extraJS: `
+<script>
+  document.querySelectorAll('.btn-delete').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Delete this article?')) return;
+      const id = btn.dataset.id;
+      const res = await fetch('/api/articles/' + id, { method: 'DELETE' });
+      if (res.ok) location.reload();
+      else alert('Delete failed');
+    });
+  });
+  document.querySelectorAll('.btn-publish').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Publish this article?')) return;
+      const id = btn.dataset.id;
+      const res = await fetch('/api/articles/' + id + '/publish', { method: 'POST' });
+      if (res.ok) location.reload();
+      else alert('Publish failed');
+    });
+  });
+</script>
+` }) %>

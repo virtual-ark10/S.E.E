@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= seo.title %></title>
+  <meta name="description" content="<%= seo.description %>">
+  <meta name="keywords" content="<%= seo.keywords %>">
+  <meta property="og:title" content="<%= seo.og.title %>">
+  <meta property="og:description" content="<%= seo.og.description %>">
+  <meta property="og:type" content="<%= seo.og.type %>">
+  <meta property="og:url" content="<%= seo.og.url %>">
+  <link rel="canonical" href="<%= seo.canonical %>">
+  <!-- Google Fonts - Nunito -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #ff1844;
+      --accent-dark: #e0153a;
+      --accent-light: #ff6b8a;
+      --text-primary: #2d3436;
+      --text-secondary: #636e72;
+      --text-muted: #b2bec3;
+      --bg: #f6f6f6;
+      --surface: #ffffff;
+      --border: #e0e0e0;
+    }
+    body {
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { color: var(--accent-dark); }
+
+    /* Hero Section */
+    .blog-hero {
+      background: linear-gradient(135deg, #ff1844 0%, #ff6b8a 100%);
+      color: white;
+      padding: 80px 0 60px;
+      position: relative;
+      overflow: hidden;
+    }
+    .blog-hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+      opacity: 0.1;
+    }
+    .blog-hero .container { position: relative; z-index: 2; }
+    .blog-hero h1 { font-weight: 800; }
+    .blog-hero p { opacity: 0.9; }
+
+    /* Blog Cards */
+    .blog-card {
+      border: none;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+      transition: all 0.3s ease;
+      background: var(--surface);
+    }
+    .blog-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+    .blog-card img {
+      height: 200px;
+      object-fit: cover;
+      width: 100%;
+    }
+    .blog-card .card-body { padding: 1.5rem; }
+    .blog-card .card-title a {
+      color: var(--text-primary);
+      font-weight: 700;
+      transition: color 0.2s;
+    }
+    .blog-card .card-title a:hover { color: var(--accent); }
+
+    /* Category Badge */
+    .category-badge {
+      background: rgba(255, 24, 68, 0.1);
+      color: var(--accent);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .category-badge.pillar {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    /* Filter Buttons */
+    .filter-btn {
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.375rem 1rem;
+      transition: all 0.2s;
+    }
+    .filter-btn.active,
+    .btn-primary.filter-btn {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+    .filter-btn.active:hover,
+    .btn-primary.filter-btn:hover {
+      background: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+
+    /* Pagination */
+    .page-link {
+      color: var(--accent);
+      border-radius: 8px;
+      margin: 0 0.125rem;
+      font-weight: 600;
+    }
+    .page-item.active .page-link {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .page-link:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    /* Read More Button */
+    .btn-outline-primary {
+      color: var(--accent);
+      border-color: var(--accent);
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .btn-outline-primary:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    /* Footer */
+    .blog-footer {
+      background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+      color: white;
+      padding: 3rem 0 1.5rem;
+      margin-top: 4rem;
+    }
+    .blog-footer a { color: rgba(255,255,255,0.8); text-decoration: none; }
+    .blog-footer a:hover { color: var(--accent-light); text-decoration: underline; }
+    .footer-bottom {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="/" style="color: var(--accent); font-size: 1.5rem;">
+      <i class="bi bi-gear-wide-connected me-2"></i><%= config.platformName %>
+    </a>
+    <div class="d-flex align-items-center gap-2">
+      <a href="/blog" class="btn btn-sm btn-outline-secondary" style="border-radius: 20px;">Blog</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<div class="blog-hero text-center">
+  <div class="container">
+    <h1 class="display-5 fw-bold mb-3"><%= config.platformName %> Blog</h1>
+    <p class="lead">Discover guides, reviews, and insights</p>
+  </div>
+</div>
+
+<div class="container py-5">
+  <!-- Filters -->
+  <div class="d-flex gap-2 mb-4 flex-wrap">
+    <a href="/blog" class="btn btn-sm filter-btn <%= !filters.category ? 'btn-primary' : 'btn-outline-secondary' %>">All</a>
+    <% (config.articleCategories || []).forEach(cat => { %>
+      <a href="/blog?category=<%= cat %>" class="btn btn-sm filter-btn <%= filters.category === cat ? 'btn-primary' : 'btn-outline-secondary' %>"><%= cat %></a>
+    <% }) %>
+  </div>
+
+  <% if (articles.length === 0) { %>
+    <div class="text-center py-5">
+      <i class="bi bi-file-earmark-text display-3" style="color: var(--text-muted);"></i>
+      <p class="mt-3" style="color: var(--text-secondary);">No articles published yet.</p>
+    </div>
+  <% } else { %>
+    <div class="row g-4">
+      <% articles.forEach(article => { %>
+        <div class="col-md-6 col-lg-4">
+          <div class="card blog-card h-100">
+            <% if (article.featuredImage) { %>
+              <img src="<%= article.featuredImage %>" alt="<%= article.title %>">
+            <% } else { %>
+              <div style="height:200px; background: linear-gradient(135deg, #ff1844 0%, #ff6b8a 100%); display: flex; align-items: center; justify-content: center;">
+                <i class="bi bi-file-text" style="font-size: 3rem; color: rgba(255,255,255,0.5);"></i>
+              </div>
+            <% } %>
+            <div class="card-body d-flex flex-column">
+              <div class="mb-2">
+                <% if (article.category) { %><span class="category-badge d-inline-block"><%= article.category %></span><% } %>
+                <% if (article.isPillarContent) { %><span class="category-badge pillar d-inline-block ms-1">Pillar</span><% } %>
+              </div>
+              <h5 class="card-title mt-1"><a href="/blog/<%= article.slug %>"><%= article.title %></a></h5>
+              <p class="card-text small" style="color: var(--text-secondary);"><%= article.excerpt ? article.excerpt.substring(0, 120) + '...' : '' %></p>
+              <div class="d-flex justify-content-between align-items-center mt-auto pt-3">
+                <small style="color: var(--text-muted);"><%= article.publishedAt ? new Date(article.publishedAt).toLocaleDateString() : '' %></small>
+                <a href="/blog/<%= article.slug %>" class="btn btn-sm btn-outline-primary">Read More</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+
+    <!-- Pagination -->
+    <% if (pagination.pages > 1) { %>
+      <nav class="mt-5">
+        <ul class="pagination justify-content-center">
+          <% for (let i = 1; i <= pagination.pages; i++) { %>
+            <li class="page-item <%= pagination.page === i ? 'active' : '' %>">
+              <a class="page-link" href="?page=<%= i %>&category=<%= filters.category || '' %>"><%= i %></a>
+            </li>
+          <% } %>
+        </ul>
+      </nav>
+    <% } %>
+  <% } %>
+</div>
+
+<!-- Footer -->
+<footer class="blog-footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <h5 class="fw-bold mb-3"><i class="bi bi-gear-wide-connected me-2"></i><%= config.platformName %></h5>
+        <p style="color: rgba(255,255,255,0.7); max-width: 400px;">Discover the best guides, reviews, and insights. Powered by S.E.E.</p>
+      </div>
+      <div class="col-md-3">
+        <h6 class="fw-bold mb-3">Quick Links</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="/blog">Blog</a></li>
+          <li class="mb-2"><a href="/">Home</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <h6 class="fw-bold mb-3">Resources</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="/sitemap.xml">Sitemap</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="mb-0">&copy; <%= new Date().getFullYear() %> <%= config.platformName %>. Powered by S.E.E.</p>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

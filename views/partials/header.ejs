@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'S.E.E' %> | <%= typeof platformName !== 'undefined' ? platformName : 'S.E.E' %></title>
+  <!-- Google Fonts - Nunito -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- S.E.E Admin CSS -->
+  <link href="/css/admin.css" rel="stylesheet">
+  <% if (typeof extraCSS !== 'undefined' && extraCSS) { %><%- extraCSS %><% } %>
+</head>
+<body class="dashboard-body">
+
+<!-- Dashboard Header -->
+<header class="dashboard-header">
+  <div class="header-content">
+    <!-- Logo and Title -->
+    <div class="header-left">
+      <button class="sidebar-toggle d-xl-none" id="mobileSidebarToggle" style="background: rgba(255,24,68,0.1); color: var(--see-primary);">
+        <i class="bi bi-list"></i>
+      </button>
+      <a href="/admin" class="navbar-brand">
+        <i class="bi bi-gear-wide-connected me-2"></i>
+        <span><%= typeof platformName !== 'undefined' ? platformName : 'S.E.E' %></span>
+      </a>
+      <div class="page-title d-none d-md-block">
+        <h1 class="mb-0"><%= typeof title !== 'undefined' ? title : '' %></h1>
+      </div>
+    </div>
+
+    <!-- Header Actions -->
+    <div class="header-right">
+      <a href="/blog" target="_blank" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-box-arrow-up-right me-1"></i> View Blog
+      </a>
+      <span class="badge bg-secondary"><%= typeof config !== 'undefined' ? config.entityType : 'entity' %></span>
+    </div>
+  </div>
+</header>
+
+<!-- Dashboard Container -->
+<div class="dashboard-container">
+  <%- include('sidebar') %>
+  <main class="dashboard-main">
+    <div class="dashboard-content">
