@@ -23,6 +23,13 @@ In practice, S.E.E helps you run a repeatable SEO pipeline:
 - Strengthen topical clusters via **related-article modules** and **internal-link injection** on article pages.
 - Automate **generation** and **archival** via scheduling (so your content program keeps moving even when you’re not in the UI).
 
+### Optional SEO operator workflows (integrations)
+
+If you enable the optional integrations, S.E.E can also cover two common “ops” loops:
+
+- **Keyword discovery (Google Keyword Planner / Google Ads API)**: use `/admin/keywords` to generate keyword ideas + volume/competition from seed terms, then use those ideas to decide pillar + cluster targets for your next content batch.
+- **Faster indexing (Google Indexing API)**: automatically submit URLs to Google when an article transitions to `published` (and optionally submit deletion when archiving/deleting), reducing the manual overhead of “publish → wait → check indexing.”
+
 ## Tech stack
 
 - **Node.js** (ES Modules)
@@ -30,8 +37,8 @@ In practice, S.E.E helps you run a repeatable SEO pipeline:
 - **MongoDB** via **Mongoose**
 - **EJS** templates (admin + blog)
 - **OpenRouter** (AI chat completions)
-- Optional: **Google Ads API** (Keyword Planner ideas) via `google-ads-api`
-- Optional: **Google Indexing API** via `googleapis`
+- Optional: **Google Ads API** (Keyword Planner ideas + volume) via `google-ads-api`
+- Optional: **Google Indexing API** (URL updated/deleted notifications) via `googleapis`
 
 ## Quick start
 
@@ -75,6 +82,27 @@ Key config fields:
 - **Integrations**: `integrations.googleIndexing`, `integrations.keywordPlanner`
 
 The admin **Settings** page edits `config/default.json` through API endpoints and reloads config in-process.
+
+## Prompts (how article generation is controlled)
+
+S.E.E’s generation is prompt-driven and designed to be **repeatable across verticals**:
+
+- **Two base templates**:
+  - **Pillar** prompt (comprehensive guide): `src/prompts/templates/pillar/comprehensive-guide.template.js`
+  - **Cluster** prompt (focused article): `src/prompts/templates/cluster/focused-article.template.js`
+- **Prompt variables** come from `config/default.json → promptVariables` (e.g. `PLATFORM_NAME`, `ENTITY_TYPE`, `ENTITY_PLURAL`, `INDUSTRY_CONTEXT`, `DEFAULT_LOCATION`) and are merged into generation options by `src/prompts/promptLoader.js`.
+- **Category-specific behavior** comes from `config/default.json → categoryOverrides[category]`:
+  - `categorySpecificInstructions`
+  - `suggestedSections`
+  - optional structure/focus overrides
+
+### Customization use cases (examples)
+
+- **Switch verticals** (restaurants → car hire → SaaS directories): update `entityType/entityPlural`, `fieldMappings`, and category maps; generation and entity formatting adapt without rewriting core logic.
+- **Different SERP intent per category**: make “reviews” follow a pros/cons/rating structure while “guides” emphasize comparisons and tips via `categoryOverrides`.
+- **Brand voice + constraints**: change `promptVariables.INDUSTRY_CONTEXT` and add a custom system prompt (via settings) to enforce tone, formatting rules, and editorial standards.
+
+In short: templates provide consistency, config provides per-vertical control, and overrides let you push category-level intent and structure.
 
 ## Routes
 
