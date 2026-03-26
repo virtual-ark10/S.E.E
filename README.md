@@ -1,4 +1,4 @@
-# S.E.E — SEO Engine Extraction
+# S.E.E — SEO Engine
 
 S.E.E is a **self-hosted SEO article generation engine** with:
 
