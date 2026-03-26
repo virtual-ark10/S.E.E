@@ -246,5 +246,5 @@ Scheduler logic lives in `src/core/articleScheduler.js`.
 
 ## License
 
-Add your license here.
+MIT. See `LICENSE`.
 
