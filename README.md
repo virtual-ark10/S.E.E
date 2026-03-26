@@ -1,18 +1,27 @@
-# S.E.E — SEO Engine Extraction
+# S.E.E — SEO Engine
 
-S.E.E is a **self-hosted SEO article generation engine** with:
+S.E.E (SEO Engine Extraction) is a **self-hosted, vertical-agnostic content engine** designed for SEO operators who want to scale **topic clusters** without losing control of on-page structure, internal linking, and publishing workflows.
 
-- An **admin dashboard** to manage articles, entities, and settings
-- A **public blog** (`/blog`) that renders published articles
-- An **AI generation pipeline** (OpenRouter) for drafting articles in HTML
+It combines:
+
+- A **clean admin dashboard** for managing entities, articles, prompts, categories, and CTAs
+- A **public blog** (`/blog`) that serves published content with modern on-page UX
+- An **AI generation pipeline** (OpenRouter) that produces **HTML-first** drafts (headings, lists, paragraphs) suitable for immediate editing + publishing
+- **Pillar / cluster classification** (pillar guides + supporting cluster articles) to support topical authority building
+- **Conceptual interlinking**: related-article discovery + in-body internal link injection to strengthen cluster topology
+- A built-in **scheduler** for automated article generation and age-based archival (traffic-aware)
 - Optional integrations for **Google Indexing API** and **Google Keyword Planner** (Google Ads API)
 
 ## What it does (high level)
 
-- You manage a database of **Entities** (restaurants, car hires, etc.) in MongoDB.
-- S.E.E generates or drafts **Articles** using AI, optionally grounding output with entities from the database.
-- You edit/publish in the admin UI; published articles appear on the public blog.
-- It generates `sitemap.xml` and `robots.txt` for SEO.
+In practice, S.E.E helps you run a repeatable SEO pipeline:
+
+- Build and maintain a structured dataset of **Entities** (e.g., restaurants, services, locations) in MongoDB.
+- Generate **draft articles** with AI, optionally grounding output in your entity dataset for specificity.
+- Classify content as **pillar** (broad, comprehensive guides) or **cluster** (supporting long-tail pages) and keep relationships explicit.
+- Publish from the admin UI to a fast, clean blog, with **sitemap.xml** + **robots.txt** handled for you.
+- Strengthen topical clusters via **related-article modules** and **internal-link injection** on article pages.
+- Automate **generation** and **archival** via scheduling (so your content program keeps moving even when you’re not in the UI).
 
 ## Tech stack
 
